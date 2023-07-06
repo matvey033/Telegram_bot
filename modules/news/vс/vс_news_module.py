@@ -1,5 +1,6 @@
 from telebot import types
 from modules.news.news_num import news_num
+from modules.unknown_module import handle_unknown
 
 def handle_vc(message, bot):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -27,5 +28,5 @@ def handle_vc_category(message, bot):
     }
 
     URL = url_category.get(category)
-
-    news_num(message, bot, URL, tag='vc')
+    if URL == None: handle_unknown(message, bot)
+    else: news_num(message, bot, URL, tag='vc')

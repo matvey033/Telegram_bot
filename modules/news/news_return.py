@@ -1,6 +1,7 @@
 from modules.news.habr.parser_habr import scrape_habr
 from modules.news.vс.parser_vc import scrape_vc
 from modules.end_module import end
+from modules.unknown_module import handle_unknown
 
 def news_return(message, bot, URL, tag):
     num = message.text
@@ -14,15 +15,17 @@ def news_return(message, bot, URL, tag):
         '6 последних новостей': 6,
     }
     num_news = count_news.get(num)
+    
+    if num_news == None: handle_unknown(message, bot)
+    else:
+        if tag == 'vc': news_list = scrape_vc(URL, num_news)
+        if tag == 'habr': news_list = scrape_habr(URL, num_news)
 
-    if tag == 'vc': news_list = scrape_vc(URL, num_news)
-    if tag == 'habr': news_list = scrape_habr(URL, num_news)
+        for news in news_list:
+            title = news['title']
+            description = news['description']
+            URL = news['url']
 
-    for news in news_list:
-        title = news['title']
-        description = news['description']
-        URL = news['url']
-
-        news = f'{title}{description}{URL}'
-        bot.send_message(message.chat.id, news, parse_mode='HTML')
-    end(message, bot)
+            news = f'{title}{description}{URL}'
+            bot.send_message(message.chat.id, news, parse_mode='HTML')
+        end(message, bot)
